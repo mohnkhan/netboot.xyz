@@ -1,5 +1,15 @@
 ---
 
+- name: Symlink syslinux mbr.bin to searchable path
+  ansible.builtin.file:
+    src: /usr/lib/syslinux/mbr/mbr.bin
+    dest: /usr/lib/syslinux/mbr.bin
+    state: link
+    force: true
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - ansible_facts['os_family'] == "Debian"
+
 - name: Generate hybrid ISO x86_64 image
   ansible.builtin.shell: |
     ./util/genfsimg -o {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}.iso \
@@ -8,6 +18,11 @@
       {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}.lkrn
   args:
     chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_legacy | default(true) | bool
+    - generate_disks_efi | default(true) | bool
+
 
 - name: Generate hybrid ISO multiarch image
   ansible.builtin.shell: |
@@ -18,6 +33,22 @@
       {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-arm64.efi
   args:
     chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_legacy | default(true) | bool
+    - generate_disks_arm | default(false) | bool
+    - generate_disks_efi | default(true) | bool
+
+- name: Generate hybrid ISO arm64 image
+  ansible.builtin.shell: |
+    ./util/genfsimg -o {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-arm64.iso \
+      -s {{ bootloader_filename }} \
+      {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-arm64.efi
+  args:
+    chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_arm | default(false) | bool
 
 - name: Generate hybrid USB x86_64 image
   ansible.builtin.shell: |
@@ -27,6 +58,10 @@
       {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}.lkrn
   args:
     chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_legacy | default(true) | bool
+    - generate_disks_efi | default(true) | bool
 
 - name: Generate hybrid USB multiarch image
   ansible.builtin.shell: |
@@ -37,3 +72,47 @@
       {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-arm64.efi
   args:
     chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_legacy | default(true) | bool
+    - generate_disks_arm | default(false) | bool
+    - generate_disks_efi | default(true) | bool
+
+- name: Generate hybrid USB arm64 image
+  ansible.builtin.shell: |
+    ./util/genfsimg -o {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-arm64.img \
+      -s {{ bootloader_filename }} \
+      {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-arm64.efi
+  args:
+    chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_arm | default(false) | bool
+
+- name: Generate legacy-driver hybrid ISO x86_64 image
+  ansible.builtin.shell: |
+    ./util/genfsimg -o {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-legacy.iso \
+      -s {{ bootloader_filename }} \
+      {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-legacy.efi \
+      {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-legacy.lkrn
+  args:
+    chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_legacy | default(true) | bool
+    - generate_disks_efi | default(true) | bool
+    - generate_disks_legacy_usb | default(true) | bool
+
+- name: Generate legacy-driver hybrid USB x86_64 image
+  ansible.builtin.shell: |
+    ./util/genfsimg -o {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-legacy.img \
+      -s {{ bootloader_filename }} \
+      {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-legacy.efi \
+      {{ netbootxyz_root }}/ipxe/{{ bootloader_filename }}-legacy.lkrn
+  args:
+    chdir: "{{ ipxe_source_dir }}/src"
+  when:
+    - generate_disks_hybrid | default(false) | bool
+    - generate_disks_legacy | default(true) | bool
+    - generate_disks_efi | default(true) | bool
+    - generate_disks_legacy_usb | default(true) | bool

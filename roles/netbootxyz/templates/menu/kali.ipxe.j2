@@ -10,6 +10,7 @@ set os {{ releases.kali.name }}
 set os_arch ${arch}
 iseq ${os_arch} x86_64 && set os_arch amd64 ||
 iseq ${os_arch} i386 && set os_arch i386 ||
+iseq ${os_arch} arm64 && set os_arch arm64 ||
 menu ${os} - ${os_arch}
 {% for item in releases.kali.versions %}
 item {{ item.code_name }} ${space} ${os} {{ item.name }}
@@ -36,6 +37,8 @@ initrd ${kali_mirror}/${dir}/initrd.gz
 echo
 echo MD5sums:
 md5sum linux initrd.gz
+iseq ${os_arch} amd64 && shim ${kali_mirror}/${dir}/bootnetx64.efi ||
+iseq ${os_arch} arm64 && shim ${kali_mirror}/${dir}/bootnetaa64.efi ||
 boot
 
 :kali_exit

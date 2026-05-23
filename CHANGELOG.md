@@ -3,7 +3,274 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.0.2] - 2026-05-05
+
+### Added
+
+- Omarchy Linux live image support
+- Ubuntu 26.04 LTS (Resolute Raccoon) installer and live images
+- Fedora 44 installer support
+- CentOS Stream CoreOS (SCOS) and Red Hat Enterprise Linux CoreOS (RHCOS) menu entries
+- Legacy USB iPXE bootloader variants (`netboot.xyz-legacy.*`) for systems where USB NIC drivers prevent USB keyboard input under BIOS
+
+### Changed
+
+- Updated Ansible to v13.6.0
+- Updated ansible-lint to v26.4.0
+- Removed older Ubuntu versions from the menu
+- Updated OpenBSD release information
+- Improved readability of legacy USB bootloader descriptions in README
+- Various distribution version updates across all supported operating systems
+
+### Fixed
+
+- live-debian major version filter now uses `.startswith()` to avoid matching unintended versions
+
+## [3.0.1] - 2026-03-27
+
+### Added
+
+- UEFI Secure Boot support using iPXE v2.0.0 signed binaries with ISO, USB, and tarball release assets
+  - See [Secure Boot documentation](https://netboot.xyz/docs/kb/hardware/secureboot) for details
+- Ubuntu installer HWE (Hardware Enablement) kernel support
+- Debian 13 (Trixie) live images
+
+### Changed
+
+- Updated Ansible to v13.4.0
+- Updated aws-actions/configure-aws-credentials action to v6
+- Dropped Debian 12 live images in favor of Debian 13
+- Various distribution version updates across all supported operating systems
+
+### Fixed
+
+- Ansible INJECT_FACTS_AS_VARS deprecation warnings resolved
+- Stale HWE kernel selection cleared on Ubuntu menu re-entry
+- Secure Boot checksum and asset path handling corrected
+- Secure Boot x86_64 USB image type corrected from Script to IMG
+
+## [3.0.0] - 2026-01-24
+
+### Added
+
+- Proxmox Datacenter Manager support with text and debug installation modes
+- Memtest86+ v8.00 series support
+
+### Changed
+
+- **BREAKING**: Updated embedded certificates used for image signature verification in iPXE bootloaders
+- Users with 2.x bootloaders will be automatically upgraded to 3.x on first boot
+- Bumped major version to 3.x series due to code signing certificate updates requiring bootloader update
+- Various distribution version updates across all supported operating systems
+- Improved certificate retrieval script with commit SHA validation output
+
+### Fixed
+
+- Oracle Linux menu items now properly filter by architecture (x86_64 vs aarch64)
+- OpenSUSE Tumbleweed ARM64 build configuration corrected to use ports mirror
+- Flatcar Container Linux boot redirect issue resolved
+
+## [2.0.89] - 2025-11-08
+
+### Added
+
+- OpenSUSE 16.0 support with live ISO boot method
+- Dasharo Tools Suite updated to v2.7.0 and v2.7.1
+
+### Changed
+
+- Updated Ansible to v12 for improved build system
+- Updated ansible-lint to v24.12.2 with compatibility fixes
+- Various distribution version updates:
+  - Arch Linux updated to 2025.11.01
+  - SmartOS updated to 20251030T000436Z
+  - CoreOS updated to 42.20251012.3.0-stable, 43.20251024.2.0-testing, 43.20251027.1.0-next
+  - IPFire updated to 2.29-core198
+- Improved dependency tracking in GitHub workflows
+- Updated GitHub Actions:
+  - actions/checkout to v5
+  - actions/setup-python to v6
+  - aws-actions/configure-aws-credentials to v5
+
+### Fixed
+
+- OpenSUSE 16.0 boot configuration now uses live ISO method with proper root= parameter
+- Ansible-lint configuration updated to skip var-naming rule for internal variables
+- CI/CD compatibility issues resolved between Ansible and ansible-lint versions
+- Renovate configuration JSON syntax errors corrected
+
+## [2.0.88] - 2025-08-09
+
+### Added
+
+- CachyOS live distribution with archiso boot configuration
+- Ubuntu Spins distribution template for Ubuntu flavor variants  
+- Debian 13 (Trixie) net installer
+- Rocky Linux 10 and AlmaLinux 10 
+- Flatcar Container Linux ARM64 architecture support
+- Proxmox VE 9.0
+- Dasharo Tools Suite updated to v2.6.0
+- SystemRescue archiso_pxe_http initrd support
+
+### Changed
+
+- FreeDOS updated to v1.4 with corrected URLs
+- Various distribution version updates and endpoint refreshes
+- Improved MAC address handling in TFTP boot configuration
+
+### Fixed
+
+- Fedora CoreOS kernel filename format corrected
+
+### Removed
+
+- Deepin distribution completely removed from the system
+
+## [2.0.87] - 2025-05-08
+
+### Added
+
+- Fedora Onyx build
+- Kali arm64 Added
+
+### Changed
+
+- Various version updates
+- Cleanup of older distros from endpoints
+
+## [2.0.86] - 2025-03-13
+
+### Added
+
+- Support for Kairos
+- Enabled NFS support in iPXE
+
+## [2.0.85] - 2025-02-23
+
+### Changed
+
+- Various version updates
+- Checks for boot timeout from local-vars.ipxe
+
+## [2.0.84] - 2025-01-04
+
+### Added
+
+- UEFI Shell available under utilities for x86/ARM UEFI mode
+- Floppy boot images for UEFI
+- Dasharo Tools Suite
+- Latest GRML added with ARM support
+
+### Changed
+
+- Moves win_base_url and rhel_base_url out of boot.cfg to local-vars.ipxe as they are
+  user defined variables.
+- Adds a check in boot.cfg to see if live_endpoint is set from local-vars.ipxe. This
+  will allow the user to set their overrides locally on their network.
+
+## [2.0.83] - 2024-11-07
+
+### Changed
+
+- Various version updates
+
+## [2.0.82] - 2024-09-18
+
+### Changed
+
+- Various version updates
+
+## [2.0.81] - 2024-08-10
+
+### Added
+
+- Added ZFSBootMenu
+- Added VanillaOS
+- Added Super Grub2 Disk for EFI
+
+### Fixed
+
+- Slowness with Ubuntu 24.04 net install getting stuck on Cloud Init
+- Removed hard coded console on VyOS to fix on Equinix Metal
+
+## [2.0.80] - 2024-07-17
+
+### Added
+
+- Adds option for setting System Resuce password 
+
+### Removed
+
+- Scientific Linux (EOL)
+
+## [2.0.79] - 2024-05-25
+
+### Added
+
+- Added Talos to arm64 menu
+- Ubuntu 24.04 LTS, Fedora 40, and many other version updates
+
+### Changed 
+
+- Dropped newer Ubuntu Live Image versions as they don't properly work anymore
+
+## [2.0.78] - 2024-03-30
+
+### Fixed
+
+- Resolves an issue with the generated index having incorrect naming on the links due
+  to a previous variable name change on the index template
+- Proxmox iso names are corrected for backup and mailgateway
+
+## [2.0.77] - 2024-02-24
+
+### Fixed
+
+- Talos menu fixed
+
+### Changed
+
+- Use bootloader_filename instead of site_name for bootloader filenames
+
+## [2.0.76] - 2023-12-31
+
+### Added
+
+- Memtest86+ 6.20 for EFI and Legacy x86_64 modes, leaves 5.01 for Legacy purposes
+  as some issues were noticed loading 6.20 Legacy on KVM where it hangs on
+  loading but works fine using VMware.
+- ARM ISO and USB Images added
+- Tunable make_num_jobs for compiling in parallel
+
+## [2.0.75] - 2023-12-03
+
+### Fixed
+
+- Updated CentOS to be able to pull arm64 images
+- Updates to images that may have been missing curl in the
+  initrd for booting
+
+### Changed
+
+- Uses exit 1 on local boot now to allow for it to roll over
+  to next device in UEFI (Issue #1276)
+- Switches to using proxmox iso from asset releases so that it can
+  also be installed via local assets (Issue #1350)
+
+## [2.0.74] - 2023-11-14
+
+### Changed
+
+- Update rescue flag to include inst. prefix on RHEL based distros
+
+### Fixed
+
+- Minor bugs in Fedora menu
+- CAINE booting
+
+### Removed
+
+- Anarchy Linux
 
 
 ## [2.0.73] - 2023-10-13
@@ -250,7 +517,7 @@ All notable changes to this project will be documented in this file.
 - Added Fedora 35 Beta
 - Added Ubuntu 21.10 Impish Indri Beta
 
-### Fixes
+### Fixed
 
 - Corrected architecture naming on k3os
 
@@ -274,13 +541,13 @@ All notable changes to this project will be documented in this file.
 
 ## [2.0.47] - 2021-08-30
 
-### Fixes
+### Fixed
 
 - Corrects an issue with loading 32-bit linux menu on 64-bit platforms (https://github.com/netbootxyz/netboot.xyz/issues/978)
 
 ## [2.0.46] - 2021-08-29
 
-### Fixes
+### Fixed
 
 - Fix incorrect arch introduced on Ubuntu
 
@@ -292,7 +559,7 @@ All notable changes to this project will be documented in this file.
 - Enables utility menu for Packet non EFI
 - Updated arm menu
 
-### Fixes
+### Fixed
 
 - Refactor of architecture checks, better support for i386 and arch distros
 - Arm64 and i386 options work now
@@ -311,7 +578,7 @@ All notable changes to this project will be documented in this file.
 - Adds Param command to iPXE builds
 - Adds next-server and version info when booted locally
 
-### Fixes
+### Fixed
 
 - Fixes console issues for Ubuntu and Debian on Packet
 
@@ -330,7 +597,7 @@ All notable changes to this project will be documented in this file.
 - Adds ability to change install priority on Ubuntu Legacy
 - Adds a toggle for enabling local-vars.ipxe
 
-### Fixes
+### Fixed
 
 - Adjustments to index.html template, adds description
 - Readme tweaks for new site
@@ -341,7 +608,7 @@ All notable changes to this project will be documented in this file.
 
 - Debian 11 (Bullseye) ahead of release
 
-### Fixes
+### Fixed
 
 - Gentoo more reliable, switches to initrd.magic to avoid modifying initrd
 - Fixes to Mint menu to populate options correctly
@@ -354,7 +621,7 @@ All notable changes to this project will be documented in this file.
 - Adds support for openEuler
 - Adds ping command to iPXE build
 
-### Fixes
+### Fixed
 
 - NixOS working again, using images and iPXE configs that are generated upstream
 
@@ -376,7 +643,7 @@ All notable changes to this project will be documented in this file.
 
 - Enabled gzip and zlib support on iPXE binaries
 
-### Fixes
+### Fixed
 
 - Check for legacy undionly filename if running menu locally
 
@@ -402,7 +669,7 @@ All notable changes to this project will be documented in this file.
 
 - Ubuntu 21.04 Installer and Live Versions
 
-### Fixes
+### Fixed
 
 - Version number variable tweaks
 
@@ -424,7 +691,7 @@ All notable changes to this project will be documented in this file.
 
 - Support for AlmaLinux
 
-### Fixes
+### Fixed
 
 - Updated Debian Kernel for Live images, transitioned over to Actions from Travis
 
@@ -437,7 +704,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.0.32] - 2021-02-09
 
-### Fixes
+### Fixed
 
 - Update to latest Ubuntu maintenance release
 
@@ -448,7 +715,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.0.31] - 2021-01-18
 
-### Fixes
+### Fixed
 
 - Fixes results too large bug introduced on Ubuntu menu
 
@@ -509,7 +776,7 @@ All notable changes to this project will be documented in this file.
 - Switches builder to netbootxyz docker image on Github Container Registry
 - Simplfied Fedora Live menu
 
-### Fixes
+### Fixed
 
 - Bugfix on NixOS menu
 
@@ -761,23 +1028,29 @@ All notable changes to this project will be documented in this file.
 - FerenOS
 - Q4OS 3.10
 
-### Fixes
+### Fixed
 
 - FreeBSD working
-- Captures upstream iPXE version as ${ipxe_version}
+- Captures upstream iPXE version as ipxe_version
 - Fixes Packet and GCE Versioning
 
 ## [2.0.3] - 2020-01-02
-### Fixes
+
+### Fixed
+
 - Fixes for Live CD and Menus
 
 ## [2.0.2] - 2019-12-31
-### Fixes
+
+### Fixed
+
 - Windows fixes, timeout for version checking
 - Fixes for Deepin and Elementary
 
 ## [2.0.1] - 2019-12-27
-### Fixes
+
+### Fixed
+
 - Fixes some index.html issues so that iPXE clients exit properly
 - Change flags on genisoimage reflect el-torito options
 - Move generate_signatures to end of playbook
@@ -787,9 +1060,11 @@ All notable changes to this project will be documented in this file.
 - Fixes some discord messaging
 
 ## [2.0.0] - 2019-12-26
+
 ### Changes
 - Switches primary boot.netboot.xyz to deploy deployed with Ansible and sets up 2.x rolling release series
 
 ## [1.9.9] - 2019-12-13
+
 ### Deprecated
 - Pre 2.x series before being deployed with Ansible

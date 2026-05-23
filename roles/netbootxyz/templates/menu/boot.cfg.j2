@@ -10,11 +10,15 @@ set boot_domain {{ boot_domain }}
 # set location of memdisk
 set memdisk {{ memdisk_location }}
 
-# set location of custom netboot.xyz live assets
-set live_endpoint {{ live_endpoint }}
+# set location of custom netboot.xyz live assets, override in local-vars.ipxe
+isset ${live_endpoint} || set live_endpoint {{ live_endpoint }}
 
 # signature check enabled?
 set sigs_enabled {{ sigs_enabled | default(false) | bool | lower }}
+
+# disable signature checks if SecureBoot is active, as imgverify is not
+# available when booting via iPXE upstream's official Secure Boot image
+iseq ${efi/SecureBoot} 01 && set sigs_enabled false ||
 
 # set location of signatures for sources
 set sigs {{ sigs_location }}
@@ -23,14 +27,7 @@ set sigs {{ sigs_location }}
 iseq ${platform} efi && set ipxe_disk netboot.xyz-snponly.efi || set ipxe_disk netboot.xyz-undionly.kpxe
 
 # set default boot timeout
-set boot_timeout {{ boot_timeout }}
-
-######################################
-# Media Locations for Licensed Distros
-######################################
-
-set rhel_base_url {{ rhel_base_url | default("") }}
-set win_base_url {{ win_base_url | default("") }}
+isset ${boot_timeout} || set boot_timeout {{ boot_timeout }}
 
 ##################
 # official mirrors
@@ -89,7 +86,7 @@ set menu_pci 0
 iseq ${platform} efi && goto efi ||
 goto architectures_end
 :efi
-set menu_bsd 0
+set menu_bsd 1
 set menu_freedos 0
 set menu_unix 0
 set menu_pci 0
@@ -128,7 +125,7 @@ goto clouds_end
 :metal_arm64
 set cmdline console=ttyAMA0,115200
 set ipxe_disk netboot.xyz-metal-arm64-snp.efi
-set menu_bsd 0
+set menu_bsd 1
 set menu_freedos 0
 set menu_live 0
 set menu_windows 0

@@ -1,12 +1,20 @@
 boot_domain: boot.netboot.xyz
 boot_timeout: 300000
-boot_version: 2.x
+boot_version: 3.x
 bootloader_disks:
 - netboot.xyz
 bootloader_http_enabled: true
 bootloader_https_enabled: true
 bootloaders:
   arm:
+  - desc: Used for CD/DVD, Virtual CDs, DRAC/iLO, VMware, Virtual Box
+    ipxe_bin: ipxe.iso
+    output_bin: -arm64.iso
+    type: ISO
+  - desc: Used for creation of USB Keys
+    ipxe_bin: ipxe.img
+    output_bin: -arm64.img
+    type: IMG
   - desc: DHCP EFI boot image file, uses built-in iPXE NIC drivers
     ipxe_bin: ipxe.efi
     output_bin: -arm64.efi
@@ -27,6 +35,16 @@ bootloaders:
   - desc: Used for creation of USB Keys
     ipxe_bin: ipxe.img
     output_bin: .img
+    type: IMG
+  hybrid_legacy_usb:
+  - desc: Legacy USB ISO for CD/DVD, Virtual CDs (no USB NIC drivers, preserves USB
+      keyboard)
+    ipxe_bin: ipxe-legacy.iso
+    output_bin: -legacy.iso
+    type: ISO
+  - desc: Legacy USB IMG for USB Keys (no USB NIC drivers, preserves USB keyboard)
+    ipxe_bin: ipxe-legacy.img
+    output_bin: -legacy.img
     type: IMG
   legacy:
   - desc: Used for booting from GRUB/EXTLINUX
@@ -49,6 +67,24 @@ bootloaders:
     ipxe_bin: undionly.kpxe
     output_bin: -undionly.kpxe
     type: DHCP-undionly
+  legacy_usb:
+  - desc: Legacy Kernel for booting from GRUB/EXTLINUX (no USB NIC drivers, preserves
+      USB keyboard)
+    ipxe_bin: ipxe-legacy.lkrn
+    output_bin: -legacy.lkrn
+    type: Kernel
+  - desc: Legacy Virtual floppy disk (no USB NIC drivers, preserves USB keyboard)
+    ipxe_bin: ipxe-legacy.dsk
+    output_bin: -legacy.dsk
+    type: Floppy
+  - desc: Legacy Padded Virtual floppy disk (no USB NIC drivers, preserves USB keyboard)
+    ipxe_bin: ipxe-legacy.pdsk
+    output_bin: -legacy.pdsk
+    type: Floppy
+  - desc: Legacy DHCP boot image file (no USB NIC drivers, preserves USB keyboard)
+    ipxe_bin: ipxe-legacy.kpxe
+    output_bin: -legacy.kpxe
+    type: DHCP
   multiarch:
   - desc: Used for CD/DVD, Virtual CDs, DRAC/iLO, VMware, Virtual Box
     ipxe_bin: ipxe.iso
@@ -67,6 +103,20 @@ bootloaders:
     ipxe_bin: snp.efi
     output_bin: -rpi4-snp.efi
     type: DHCP-snp
+  secureboot_arm64:
+  - desc: Secure Boot ARM64 ISO for CD/DVD/Virtual Media
+    output_bin: -sb-arm64.iso
+    type: ISO
+  - desc: Secure Boot ARM64 USB image
+    output_bin: -sb-arm64.img
+    type: IMG
+  secureboot_x86_64:
+  - desc: Secure Boot x86_64 ISO for CD/DVD/Virtual Media
+    output_bin: -sb.iso
+    type: ISO
+  - desc: Secure Boot x86_64 USB image
+    output_bin: -sb.img
+    type: IMG
   uefi:
   - desc: DHCP EFI boot image file, uses built-in iPXE NIC drivers
     ipxe_bin: ipxe.efi
@@ -80,6 +130,19 @@ bootloaders:
     ipxe_bin: snponly.efi
     output_bin: -snponly.efi
     type: DHCP-snponly
+  - desc: DHCP EFI Floppy boot image file, uses built-in iPXE NIC drivers
+    ipxe_bin: ipxe.efi.dsk
+    output_bin: .efi.dsk
+    type: Floppy
+  - desc: EFI Floppy image w/ Simple Network Protocol, attempts to boot all net devices
+    ipxe_bin: snp.efi.dsk
+    output_bin: -snp.efi.dsk
+    type: Floppy-snp
+  uefi_legacy_usb:
+  - desc: Legacy DHCP EFI boot image file (no USB NIC drivers, preserves USB keyboard)
+    ipxe_bin: ipxe-legacy.efi
+    output_bin: -legacy.efi
+    type: DHCP
 cert_dir: /etc/netbootxyz/certs
 cert_file_filename: ca-netboot-xyz.crt
 checksums_filename: '{{ site_name }}-sha256-checksums.txt'
@@ -97,8 +160,10 @@ generate_disks_arm: false
 generate_disks_efi: true
 generate_disks_hybrid: false
 generate_disks_legacy: true
+generate_disks_legacy_usb: true
 generate_disks_linux: false
 generate_disks_rpi: false
+generate_disks_secureboot: false
 generate_local_vars: true
 generate_menus: true
 generate_signatures: false
@@ -109,9 +174,13 @@ ipxe_ca_url: http://ca.ipxe.org/ca.crt
 ipxe_debug_enabled: false
 ipxe_debug_options: httpcore,tls
 ipxe_repo: https://github.com/ipxe/ipxe
+ipxe_secureboot_archive_url: https://github.com/ipxe/ipxe/releases/download/{{ ipxe_secureboot_version
+  }}/ipxeboot.tar.gz
+ipxe_secureboot_version: v2.0.0
 ipxe_source_dir: /usr/src/ipxe
 kernel_params: initrd=initrd.magic ${cmdline}
 live_endpoint: https://github.com/netbootxyz
+make_num_jobs: 1
 memdisk_location: http://${boot_domain}/memdisk
 netbootxyz_conf_dir: /etc/netbootxyz
 netbootxyz_root: /var/www/html
@@ -127,6 +196,8 @@ releases:
     mirror: http://repo.almalinux.org
     name: AlmaLinux
     versions:
+    - code_name: 10
+      name: 10 (Latest)
     - code_name: 9
       name: 9 (Latest)
     - code_name: 8
@@ -138,17 +209,10 @@ releases:
     mirror: http://dl-cdn.alpinelinux.org
     name: Alpine Linux
     versions:
-    - code_name: v3.18
-      name: '3.18'
+    - code_name: v3.23
+      name: '3.23'
     - code_name: edge
       name: Edge (development)
-  anarchy:
-    enabled: true
-    menu: linux
-    name: Anarchy Linux
-    versions:
-    - code_name: current
-      name: current
   archlinux:
     base_dir: archlinux
     enabled: true
@@ -156,8 +220,8 @@ releases:
     mirror: mirrors.kernel.org
     name: Arch Linux
     versions:
-    - code_name: 2023.10.14
-      name: 2023.10.14
+    - code_name: 2026.05.01
+      name: 2026.05.01
   blackarch:
     enabled: true
     menu: linux
@@ -166,22 +230,16 @@ releases:
     - code_name: current
       name: current
   centos:
-    base_dir: centos
+    base_dir: null
     enabled: true
     menu: linux
-    mirror: http://mirror.centos.org
-    name: CentOS
+    mirror: https://mirror.stream.centos.org
+    name: CentOS Stream
     versions:
+    - code_name: 10-stream
+      name: 10.0 Stream
     - code_name: 9-stream
       name: 9.0 Stream
-    - code_name: 8.5.2111
-      name: '8.5'
-    - code_name: 8
-      name: 8.x Latest
-    - code_name: 8-stream
-      name: 8.0 Stream
-    - code_name: 7
-      name: 7.x Latest
   coreos:
     base_dir: prod/streams
     enabled: true
@@ -189,11 +247,11 @@ releases:
     mirror: https://builds.coreos.fedoraproject.org
     name: Fedora CoreOS
     versions:
-    - code_name: 38.20231002.3.1
+    - code_name: 43.20260413.3.2
       name: stable
-    - code_name: 38.20231014.2.0
+    - code_name: 44.20260419.2.1
       name: testing
-    - code_name: 39.20231016.1.0
+    - code_name: 44.20260426.1.1
       name: next
   debian:
     archive_mirror: http://archive.debian.org
@@ -204,15 +262,13 @@ releases:
     name: Debian
     versions:
       stable:
+      - code_name: trixie
+        name: 13.0 (trixie)
       - code_name: bookworm
         name: 12.0 (bookworm)
-      - code_name: bullseye
-        name: 11.0 (bullseye)
-      - code_name: buster
-        name: 10.0 (buster)
       testing:
-      - code_name: trixie
-        name: trixie (testing)
+      - code_name: forky
+        name: forky (testing)
       - code_name: sid
         name: sid (unstable)
   devuan:
@@ -239,12 +295,12 @@ releases:
     mirror: http://mirrors.kernel.org
     name: Fedora
     versions:
-    - code_name: 39
-      name: 39
-    - code_name: 38
-      name: 38
-    - code_name: 37
-      name: 37
+    - code_name: 44
+      name: 44
+    - code_name: 43
+      name: 43
+    - code_name: 42
+      name: 42
   flatcar:
     enabled: true
     menu: linux
@@ -264,16 +320,16 @@ releases:
     menu: bsd
     name: FreeBSD
   freedos:
-    base_dir: pub/micro/pc-stuff/freedos/files/distributions/1.3/official
+    base_dir: pub/micro/pc-stuff/freedos/files/distributions/1.4
     enabled: true
     menu: dos
     mirror: http://www.ibiblio.org
     name: FreeDOS
     versions:
-    - code_name: FD13-FullUSB
-      name: 1.3 Full Installer
-    - code_name: FD13-LiteUSB
-      name: 1.3 Lite Installer
+    - code_name: FD14-FullUSB
+      name: 1.4 Full Installer
+    - code_name: FD14-LiteUSB
+      name: 1.4 Lite Installer
   gentoo:
     enabled: true
     menu: linux
@@ -289,13 +345,47 @@ releases:
     mirror: https://downloads.ipfire.org
     name: IPFire
     versions:
-    - code_name: 2.27-core180
-      name: 2.27 Core180
+    - code_name: 2.29-core201
+      name: 2.29 Core201
   k3os:
     enabled: true
     menu: linux
     mirror: https://github.com/rancher/k3os/releases
     name: k3OS
+  kairos:
+    enabled: true
+    flavors:
+    - key: core
+      name: Core
+    - key: k3sv1.30.11-k3s1
+      name: k3s v1.30.11-k3s1 (Standard)
+    - key: k3sv1.31.7-k3s1
+      name: k3s v1.31.7-k3s1 (Standard)
+    - key: k3sv1.32.3-k3s1
+      name: k3s v1.32.3-k3s1 (Standard)
+    menu: linux
+    mirror: https://github.com/kairos-io/kairos/releases
+    name: Kairos
+    platforms:
+    - key: alpine-3.21
+      name: Alpine Linux 3.21
+    - key: debian-12
+      name: Debian 12
+    - key: fedora-40
+      name: Fedora 40
+    - key: opensuse-leap-15.6
+      name: openSUSE Leap 15.6
+    - key: opensuse-tumbleweed
+      name: openSUSE Tumbleweed
+    - key: rockylinux-9
+      name: Rocky Linux 9
+    - key: ubuntu-22.04
+      name: Ubuntu 22.04
+    - key: ubuntu-24.04
+      name: Ubuntu 24.04
+    - key: ubuntu-24.10
+      name: Ubuntu 24.10
+    version: v3.5.3
   kali:
     base_dir: kali
     enabled: true
@@ -322,20 +412,28 @@ releases:
     menu: linux
     name: NixOS
     versions:
-    - code_name: nixos-20.09
-      name: nixos-20.09
-    - code_name: nixos-21.05
-      name: nixos-21.05
-    - code_name: nixos-21.11
-      name: nixos-21.11
-    - code_name: nixos-22.05
-      name: nixos-22.05
-    - code_name: nixos-22.11
-      name: nixos-22.11
+    - code_name: nixos-25.11
+      name: nixos-25.11
+    - code_name: nixos-25.05
+      name: nixos-25.05
+    - code_name: nixos-24.11
+      name: nixos-24.11
+    - code_name: nixos-24.05
+      name: nixos-24.05
+    - code_name: nixos-23.11
+      name: nixos-23.11
     - code_name: nixos-23.05
       name: nixos-23.05
-    - code_name: nixos-unstable
-      name: nixos-unstable
+    - code_name: nixos-22.11
+      name: nixos-22.11
+    - code_name: nixos-22.05
+      name: nixos-22.05
+    - code_name: nixos-21.11
+      name: nixos-21.11
+    - code_name: nixos-21.05
+      name: nixos-21.05
+    - code_name: nixos-20.09
+      name: nixos-20.09
   openEuler:
     base_dir: null
     enabled: true
@@ -343,8 +441,10 @@ releases:
     mirror: http://repo.openeuler.org
     name: openEuler
     versions:
-    - code_name: openEuler-23.09
-      name: openEuler-23.09
+    - code_name: openEuler-24.09
+      name: openEuler-24.09
+    - code_name: openEuler-24.03-LTS-SP1
+      name: openEuler-24.03-LTS-SP1
     - code_name: openEuler-20.03-LTS-SP3
       name: openEuler-20.03-LTS-SP3
     - code_name: openEuler-22.03-LTS
@@ -357,21 +457,18 @@ releases:
     base_dir: pub/OpenBSD
     enabled: true
     menu: bsd
-    mirror: http://ftp.openbsd.org
+    mirror: http://cdn.openbsd.org
     name: OpenBSD
     versions:
-    - code_name: '7.4'
-      image_ver: '74'
-      name: '7.4'
-    - code_name: '7.3'
-      image_ver: '73'
-      name: '7.3'
-    - code_name: '7.2'
-      image_ver: '72'
-      name: '7.2'
     - code_name: snapshots
-      image_ver: '74'
-      name: 7.4 Latest Snapshot
+      image_ver: '79'
+      name: Latest Snapshot
+    - code_name: '7.9'
+      image_ver: '79'
+      name: '7.9'
+    - code_name: '7.8'
+      image_ver: '78'
+      name: '7.8'
   opensuse:
     base_dir: distribution/leap
     enabled: true
@@ -379,12 +476,10 @@ releases:
     mirror: http://download.opensuse.org
     name: openSUSE
     versions:
-    - code_name: '15.5'
-      name: openSUSE Leap 15.5
-    - code_name: '15.4'
-      name: openSUSE Leap 15.4
-    - code_name: '15.3'
-      name: openSUSE Leap 15.3
+    - code_name: '16.0'
+      name: openSUSE Leap 16.0
+    - code_name: '15.6'
+      name: openSUSE Leap 15.6
     - code_name: tumbleweed
       name: openSUSE tumbleweed
   oracle:
@@ -393,7 +488,6 @@ releases:
     mirror: https://yum.oracle.com
     name: Oracle Linux
     paths:
-      7: /repo/OracleLinux/OL7/latest
       8: /repo/OracleLinux/OL8/baseos/latest
       9: /repo/OracleLinux/OL9/baseos/latest
   photon:
@@ -404,6 +498,37 @@ releases:
     enabled: true
     menu: linux
     name: Proxmox
+  rhcos:
+    base_dir: pub/openshift-v
+    enabled: true
+    menu: linux
+    mirror: https://mirror.openshift.com
+    name: Red Hat Enterprise Linux CoreOS
+    versions:
+    - code_name: 4.12
+      major_version: 4
+      name: 4.12 [Extended Support]
+    - code_name: 4.14
+      major_version: 4
+      name: 4.14 [Extended Support]
+    - code_name: 4.16
+      major_version: 4
+      name: 4.16 [Extended Support]
+    - code_name: 4.17
+      major_version: 4
+      name: 4.17 [Maintenance Support]
+    - code_name: 4.18
+      major_version: 4
+      name: 4.18 [Maintenance Support]
+    - code_name: 4.19
+      major_version: 4
+      name: 4.19 [Maintenance Support]
+    - code_name: 4.2
+      major_version: 4
+      name: 4.20 [Full Support]
+    - code_name: 4.21
+      major_version: 4
+      name: 4.21 [Full Support]
   rhel:
     enabled: true
     menu: linux
@@ -415,25 +540,34 @@ releases:
     mirror: http://download.rockylinux.org
     name: Rocky Linux
     versions:
+    - code_name: 10
+      name: 10 (Latest)
     - code_name: 9
       name: 9 (Latest)
     - code_name: 8
       name: 8 (Latest)
-  scientific:
-    base_dir: linux/scientific
+  scos:
+    base_dir: centos/scos
     enabled: true
     menu: linux
-    mirror: http://ftp1.scientificlinux.org
-    name: Scientific Linux
+    mirror: https://cloud.centos.org
+    name: CentOS Stream CoreOS
     versions:
-    - code_name: '7.7'
-      name: '7.7'
-    - code_name: '7.6'
-      name: '7.6'
-    - code_name: '6.10'
-      name: '6.10'
-    - code_name: '6.9'
-      name: '6.9'
+    - code_name: 9.0.20250222-0
+      major_version: 9
+      name: 9.0.20250222-0
+    - code_name: 9.0.20250411-0
+      major_version: 9
+      name: 9.0.20250411-0
+    - code_name: 9.0.20250510-0
+      major_version: 9
+      name: 9.0.20250510-0
+    - code_name: 10.0.20250628-0
+      major_version: 10
+      name: 10.0.20250628-0
+    - code_name: 10.0.20251103-0
+      major_version: 10
+      name: 10.0.20251103-0
   slackware:
     base_dir: slackware
     enabled: true
@@ -453,17 +587,17 @@ releases:
     base_dir: /platform/i86pc/
     enabled: true
     menu: unix
-    mirror: https://netboot.joyent.com/os/
+    mirror: https://netboot.smartos.org/os/
     name: SmartOS
     versions:
-    - code_name: 20231019T000454Z
-      name: 20231019T000454Z
-    - code_name: 20231005T000607Z
-      name: 20231005T000607Z
-    - code_name: 20230921T034751Z
-      name: 20230921T034751Z
-    - code_name: 20230907T000420Z
-      name: 20230907T000420Z
+    - code_name: 20260430T145637Z
+      name: 20260430T145637Z
+    - code_name: 20260430T003027Z
+      name: 20260430T003027Z
+    - code_name: 20260416T000037Z
+      name: 20260416T000037Z
+    - code_name: 20260402T000627Z
+      name: 20260402T000627Z
   talos:
     enabled: true
     menu: linux
@@ -476,14 +610,28 @@ releases:
       name: AWS
     - key: azure
       name: Azure
-    - key: digital-ocean
+    - key: digitalocean
       name: Digital Ocean
+    - key: equinixMetal
+      name: Equinix Metal
     - key: gcp
       name: GCP
-    - key: metal
-      name: Equinix Metal
+    - key: hcloud
+      name: Hetzner Cloud
+    - key: nocloud
+      name: Nocloud
+    - key: openstack
+      name: Openstack
+    - key: oracle
+      name: oracle
+    - key: scaleway
+      name: Scaleway
+    - key: upcloud
+      name: Upcloud
     - key: vmware
       name: VMware
+    - key: vultr
+      name: Vultr
   tinycore:
     enabled: true
     menu: linux
@@ -492,13 +640,13 @@ releases:
     versions:
     - arch: x86
       code_name: core
-      initrd: /14.x/x86/release/distribution_files/core.gz
-      kernel: /14.x/x86/release/distribution_files/vmlinuz
+      initrd: /17.x/x86/release/distribution_files/core.gz
+      kernel: /17.x/x86/release/distribution_files/vmlinuz
       name: Core
     - arch: x86_64
       code_name: corepure
-      initrd: /14.x/x86_64/release/distribution_files/corepure64.gz
-      kernel: /14.x/x86_64/release/distribution_files/vmlinuz64
+      initrd: /17.x/x86_64/release/distribution_files/corepure64.gz
+      kernel: /17.x/x86_64/release/distribution_files/vmlinuz64
       name: CorePure
     - arch: x86
       code_name: dcorebionic
@@ -598,10 +746,10 @@ releases:
     mirror: http://archive.ubuntu.com
     name: Ubuntu
     versions:
-    - code_name: mantic
-      name: 23.10 Mantic Minotaur
-    - code_name: lunar
-      name: 23.04 Lunar Lobster
+    - code_name: resolute
+      name: 26.04 LTS Resolute Raccoon
+    - code_name: noble
+      name: 24.04 LTS Noble Numbat
     - code_name: jammy
       name: 22.04 LTS Jammy Jellyfish
     - code_name: focal
@@ -612,8 +760,6 @@ releases:
       name: 18.04 LTS Bionic Beaver
     - code_name: xenial
       name: 16.04 LTS Xenial Xerus
-    - code_name: trusty
-      name: 14.04 LTS Trusty Tahr
   vmware:
     enabled: true
     menu: linux
@@ -624,7 +770,7 @@ releases:
     name: VyOS
     versions:
     - code_name: rolling
-      name: 1.4 rolling
+      name: 1.5 rolling
   zeninstall:
     enabled: true
     menu: linux
@@ -644,6 +790,11 @@ utilitiesarm:
     kernel: ${live_endpoint}{{ endpoints.memtest86.path }}memtest86-usb.img
     name: Memtest86 Free - {{ endpoints.memtest86.version }}
     type: sanboot
+  uefishell:
+    enabled: true
+    kernel: ${live_endpoint}{{ endpoints.uefishell.path }}uefi-shell-aarch64.efi
+    name: UEFI Shell
+    type: direct
 utilitiesefi:
   4mlinux:
     enabled: true
@@ -661,7 +812,7 @@ utilitiesefi:
     enabled: true
     initrd: ${live_endpoint}{{ endpoints.caine.path }}initrd
     kernel: ${live_endpoint}{{ endpoints.caine.path }}vmlinuz ip=dhcp boot=casper
-      netboot=http fetch=${live_endpoint}{{ endpoints.caine.path }}filesystem.squashfs
+      netboot=url url=${live_endpoint}{{ endpoints.caine.path }}filesystem.squashfs
       {{ kernel_params }}
     name: CAINE
     type: direct
@@ -669,23 +820,28 @@ utilitiesefi:
     enabled: true
     name: Clonezilla
     type: ipxemenu
+  dts:
+    enabled: true
+    initrd: https://boot.dasharo.com{{ endpoints.dts.path }}/dts-base-image-v{{ endpoints.dts.version
+      }}.cpio.gz
+    kernel: https://boot.dasharo.com{{ endpoints.dts.path }}/bzImage-v{{ endpoints.dts.version
+      }}
+    name: Dasharo Tools Suite
+    type: direct
   gparted:
     enabled: true
     name: GParted
-    type: ipxemenu
-  grml:
-    enabled: true
-    name: Grml
     type: ipxemenu
   kaspersky:
     enabled: true
     name: Kaspersky Rescue Disk
     type: ipxemenu
-  memtest86:
-    enabled: false
-    kernel: ${live_endpoint}{{ endpoints.memtest86.path }}memtest86-usb.img
-    name: Memtest86 Free - {{ endpoints.memtest86.version }}
-    type: sanboot
+  memtest86plus:
+    enabled: true
+    name: Memtest86+ {{ endpoints.memtest86plus.version }}
+    type: memtest
+    util_path: ${live_endpoint}{{ endpoints.memtest86plus.path }}mt86p_x86_64
+    version: '{{ endpoints.memtest86plus.version }}'
   redorescue:
     enabled: true
     initrd: ${live_endpoint}{{ endpoints.redorescue.path }}initrd
@@ -710,21 +866,42 @@ utilitiesefi:
     enabled: true
     name: ShredOS
     type: ipxemenu
+  supergrubdisk:
+    enabled: true
+    kernel: ${live_endpoint}{{ endpoints.supergrubdisk.path }}supergrub2-classic-x86_64.efi
+    name: Super Grub2 Disk
+    type: direct
   systemrescue:
     enabled: true
     name: System Rescue CD
     type: ipxemenu
+  uefishell:
+    enabled: true
+    kernel: ${live_endpoint}{{ endpoints.uefishell.path }}uefi-shell-x64.efi
+    name: UEFI Shell
+    type: direct
+  zfsbootmenu:
+    enabled: true
+    kernel: ${live_endpoint}{{ endpoints.zfsbootmenu.path }}zfsbootmenu-recovery-x86_64.efi
+    name: ZFSBootMenu
+    type: direct
 utilitiespcbios32:
   clonezilla:
     enabled: true
     name: Clonezilla
     type: ipxemenu
-  memtest:
+  memtest86legacy:
     enabled: true
-    name: Memtest
+    name: Memtest86+ 5.01.0
     type: memtest
     util_path: https://boot.netboot.xyz/utils/memtest86-5.01.0
     version: 5.01.0
+  memtest86plus:
+    enabled: true
+    name: Memtest86+ {{ endpoints.memtest86plus.version }}
+    type: memtest
+    util_path: ${live_endpoint}{{ endpoints.memtest86plus.path }}mt86p_i586
+    version: '{{ endpoints.memtest86plus.version }}'
   shredos:
     enabled: true
     name: ShredOS
@@ -769,24 +946,34 @@ utilitiespcbios64:
     enabled: true
     name: DBAN
     type: ipxemenu
+  dts:
+    enabled: true
+    initrd: https://boot.dasharo.com{{ endpoints.dts.path }}/dts-base-image-v{{ endpoints.dts.version
+      }}.cpio.gz
+    kernel: https://boot.dasharo.com{{ endpoints.dts.path }}/bzImage-v{{ endpoints.dts.version
+      }}
+    name: Dasharo Tools Suite
+    type: direct
   gparted:
     enabled: true
     name: GParted
-    type: ipxemenu
-  grml:
-    enabled: true
-    name: Grml
     type: ipxemenu
   kaspersky:
     enabled: true
     name: Kaspersky Rescue Disk
     type: ipxemenu
-  memtest:
+  memtest86legacy:
     enabled: true
-    name: Memtest
+    name: Memtest86+ 5.01.0
     type: memtest
     util_path: https://boot.netboot.xyz/utils/memtest86-5.01.0
     version: 5.01.0
+  memtest86plus:
+    enabled: true
+    name: Memtest86+ {{ endpoints.memtest86plus.version }}
+    type: memtest
+    util_path: ${live_endpoint}{{ endpoints.memtest86plus.path }}mt86p_x86_64
+    version: '{{ endpoints.memtest86plus.version }}'
   redorescue:
     enabled: true
     initrd: ${live_endpoint}{{ endpoints.redorescue.path }}initrd
@@ -813,7 +1000,7 @@ utilitiespcbios64:
     type: ipxemenu
   supergrub:
     enabled: true
-    name: SuperGRUB
+    name: Super GRUB2 Disk
     type: memdisk
     util_path: http://master.dl.sourceforge.net/project/supergrub2/2.04s1/super_grub2_disk_2.04s1/super_grub2_disk_hybrid_2.04s1.iso
     version: 2.04s1

@@ -36,6 +36,20 @@ Your favorite operating systems in one place!
 |DHCP-snp| [netboot.xyz-snp.efi](https://boot.netboot.xyz/ipxe/netboot.xyz-snp.efi)| EFI w/ Simple Network Protocol, attempts to boot all net devices|
 |DHCP-snponly| [netboot.xyz-snponly.efi](https://boot.netboot.xyz/ipxe/netboot.xyz-snponly.efi)| EFI w/ Simple Network Protocol, only boots from device chained from|
 
+#### Legacy USB iPXE Bootloaders
+
+These bootloaders use the legacy iPXE driver set which excludes USB NIC drivers. Use these if your USB keyboard does not work with the standard bootloaders, as USB NIC drivers in standard iPXE builds disable the BIOS SMM-based USB legacy support that emulates a PS/2 keyboard.
+
+| Type | Bootloader | Description |
+|------|------------|-------------|
+|ISO| [netboot.xyz-legacy.iso](https://boot.netboot.xyz/ipxe/netboot.xyz-legacy.iso)| Legacy USB combined ISO for CD/DVD, Virtual CDs|
+|USB| [netboot.xyz-legacy.img](https://boot.netboot.xyz/ipxe/netboot.xyz-legacy.img)| Legacy USB combined IMG for USB Keys|
+|Kernel| [netboot.xyz-legacy.lkrn](https://boot.netboot.xyz/ipxe/netboot.xyz-legacy.lkrn)| Legacy USB Kernel for booting from GRUB/EXTLINUX|
+|Floppy| [netboot.xyz-legacy.dsk](https://boot.netboot.xyz/ipxe/netboot.xyz-legacy.dsk)| Legacy USB Virtual floppy disk|
+|Padded Floppy| [netboot.xyz-legacy.pdsk](https://boot.netboot.xyz/ipxe/netboot.xyz-legacy.pdsk)| Legacy USB Padded Virtual floppy disk|
+|DHCP| [netboot.xyz-legacy.kpxe](https://boot.netboot.xyz/ipxe/netboot.xyz-legacy.kpxe)| Legacy USB DHCP boot image file|
+|DHCP-efi| [netboot.xyz-legacy.efi](https://boot.netboot.xyz/ipxe/netboot.xyz-legacy.efi)| Legacy USB DHCP EFI boot image file|
+
 #### ARM64 iPXE Bootloaders
 
 | Type | Bootloader | Description |
@@ -90,7 +104,7 @@ Please see the [self-hosting docs](https://netboot.xyz/docs/selfhosting/) for mo
 To generate, run:
 
 ```
-ansible-playbook -i inventory site.yml
+ansible-playbook site.yml
 ```
 
 The build output will be located in /var/www/html by default.
@@ -98,8 +112,8 @@ The build output will be located in /var/www/html by default.
 #### Deploying with Docker
 
 ```
-docker build -t localbuild -f Dockerfile .
-docker run --rm -it -v $(pwd):/buildout localbuild
+docker build -t localbuild --platform=linux/amd64 -f Dockerfile .
+docker run --rm -it --platform=linux/amd64 -v $(pwd):/buildout localbuild
 ```
 
 The build output will be in the generated folder `buildout`
@@ -118,75 +132,78 @@ In addition to being able to host netboot.xyz locally, you can also create your 
 
 #### Operating Systems
 
-| Name       | URL             | Installer Kernel | Live OS       |
-|------------|-----------------|------------------|---------------|
-| AlmaLinux | https://almalinux.org/ | Yes | No |
-| Alpine Linux | https://alpinelinux.org | Yes | No |
-| Anarchy Linux | https://anarchyinstaller.org | Yes | No |
-| Arch Linux | https://www.archlinux.org | Yes | No |
-| Backbox | https://www.backbox.org | No | Yes |
-| BlackArch Linux | https://blackarch.org | Yes | Yes |
-| Bluestar Linux | https://sourceforge.net/projects/bluestarlinux | No | Yes |
-| Bodhi Linux | https://www.bodhilinux.com | No | Yes |
-| CentOS | https://centos.org | Yes | No |
-| CoreOS | http://coreos.com/ | Yes | No |
-| Debian | https://debian.org | Yes | Yes|
-| Deepin | https://www.deepin.org | No | Yes |
-| Devuan | https://devuan.org | Yes | No |
-| Elementary OS | https://elementary.io | No | Yes |
-| EndeavourOS | https://endeavouros.com | No | Yes |
-| Fatdog64 | https://distro.ibiblio.org/fatdog/web/ | No | Yes |
-| Fedora | https://fedoraproject.org | Yes | Yes |
-| Feren OS | https://ferenos.weebly.com/ | Yes | No |
-| Flatcar Container Linux | https://flatcar-linux.org/ | Yes | No |
-| FreeBSD | https://freebsd.org | Yes, disk image | No |
-| FreeDOS | http://www.freedos.org | ISO - Memdisk| No |
-| Garuda Linux | https://garudalinux.org/ | No | Yes |
-| Gentoo | https://gentoo.org | Yes | Yes |
-| Harvester | https://harvesterhci.io | Yes | No |
-| hrmpf | https://github.com/leahneukirchen/hrmpf/ | No | Yes |
-| IPFire | https://www.ipfire.org | Yes | No |
-| K3OS | https://k3os.io/ | Yes | Yes |
-| Kali Linux | https://www.kali.org | Yes | Yes |
-| KDE Neon | https://neon.kde.org | No | Yes |
-| Kodachi | https://www.digi77.com/linux-kodachi/ | No | Yes |
-| Linux Lite | https://www.linuxliteos.com | No | Yes |
-| LXLE | https://lxle.net/ | No | Yes |
-| Mageia | https://www.mageia.org | Yes | No |
-| Manjaro | https://manjaro.org | No | Yes |
-| Mint | https://linuxmint.com | No | Yes |
-| Microsoft Windows | https://www.microsoft.com | User supplied media | No |
-| MirOS | https://www.mirbsd.org | Yes | No |
-| Nitrux | https://nxos.org/ | No | Yes |
-| NixOS | https://nixos.org | Yes | No |
-| OpenBSD | https://openbsd.org | Yes | No |
-| openEuler | https://openeuler.org | Yes | No |
-| openSUSE | https://opensuse.org | Yes | No |
-| Oracle Linux | https://www.oracle.com/linux/ | Yes | Installer |
-| Parrot Security | https://www.parrotsec.org | No | Yes |
-| Peppermint | https://peppermintos.com | No | Yes |
-| Pop OS |https://system76.com/pop| No | Yes |
-| Proxmox Open Source Products | https://www.proxmox.com/ | Yes | No |
-| Q4OS | https://q4os.org | No | Yes |
-| Raizo | https://sourceforge.net/projects/live-raizo/ | No | Yes |
-| Red Hat Enterprise Linux | https://www.redhat.com | User supplied media | No |
-| Regolith | https://regolith-linux.org | No | Yes |
-| Rocky Linux | https://rockylinux.org/ | Yes | No |
-| Scientific Linux | https://scientificlinux.org | Yes | No |
-| Septor | https://septor.sourceforge.io | No | Yes |
-| Slackware | https://www.slackware.com | Yes | No |
-| SmartOS | https://www.joyent.com/smartos | Yes | No |
-| SparkyLinux | https://sparkylinux.org/ | No | Yes |
-| Tails | https://tails.boum.org/ | No | Yes |
-| Talos | https://www.talos.dev/ | Yes | No |
-| Tiny Core Linux | https://tinycorelinux.net | Yes | Yes |
-| Ubuntu | https://www.ubuntu.com | Yes | Yes |
-| VMware | https://www.vmware.com | User supplied media | No |
-| VMware Photon | https://vmware.github.io/photon/ | Yes | No |
-| Voyager | https://voyagerlive.org | No | Yes |
-| VyOS | https://vyos.io | Yes | No |
-| Zen Installer | https://sourceforge.net/projects/revenge-installer | Yes | No |
-| Zorin OS | https://zorinos.com | No | Yes |
+| Name                            | URL             | Installer Kernel | Live OS       |
+|---------------------------------|-----------------|------------------|---------------|
+| AlmaLinux                       | https://almalinux.org/ | Yes | No |
+| Alpine Linux                    | https://alpinelinux.org | Yes | No |
+| Arch Linux                      | https://www.archlinux.org | Yes | No |
+| Backbox                         | https://www.backbox.org | No | Yes |
+| BlackArch Linux                 | https://blackarch.org | Yes | Yes |
+| Bluestar Linux                  | https://sourceforge.net/projects/bluestarlinux | No | Yes |
+| Bodhi Linux                     | https://www.bodhilinux.com | No | Yes |
+| CachyOS                         | https://cachyos.org | No | Yes |
+| CentOS                          | https://centos.org | Yes | No |
+| CentOS Stream CoreOS            | https://centos.org | Yes | No |
+| Debian                          | https://debian.org | Yes | Yes|
+| Devuan                          | https://devuan.org | Yes | No |
+| Elementary OS                   | https://elementary.io | No | Yes |
+| EndeavourOS                     | https://endeavouros.com | No | Yes |
+| Fatdog64                        | https://distro.ibiblio.org/fatdog/web/ | No | Yes |
+| Fedora                          | https://fedoraproject.org | Yes | Yes |
+| Fedora CoreOS                   | https://getfedora.org/en/coreos?stream=stable | Yes | No |
+| Feren OS                        | https://ferenos.weebly.com/ | Yes | No |
+| Flatcar Container Linux         | https://www.flatcar.org | Yes | No |
+| FreeBSD                         | https://freebsd.org | Yes, disk image | No |
+| FreeDOS                         | https://www.freedos.org | ISO - Memdisk| No |
+| Garuda Linux                    | https://garudalinux.org/ | No | Yes |
+| Gentoo                          | https://gentoo.org | Yes | Yes |
+| Harvester                       | https://harvesterhci.io | Yes | No |
+| hrmpf                           | https://github.com/leahneukirchen/hrmpf/ | No | Yes |
+| IPFire                          | https://www.ipfire.org | Yes | No |
+| K3OS                            | https://k3os.io/ | Yes | Yes |
+| Kairos                          | https://kairos.io/ | Yes | No |
+| Kali Linux                      | https://www.kali.org | Yes | Yes |
+| KDE Neon                        | https://neon.kde.org | No | Yes |
+| Kodachi                         | https://www.digi77.com/linux-kodachi/ | No | Yes |
+| Linux Lite                      | https://www.linuxliteos.com | No | Yes |
+| LXLE                            | https://lxle.net/ | No | Yes |
+| Mageia                          | https://www.mageia.org | Yes | No |
+| Manjaro                         | https://manjaro.org | No | Yes |
+| Mint                            | https://linuxmint.com | No | Yes |
+| Microsoft Windows               | https://www.microsoft.com | User supplied media | No |
+| MirOS                           | http://www.mirbsd.org | Yes | No |
+| Nitrux                          | https://nxos.org/ | No | Yes |
+| NixOS                           | https://nixos.org | Yes | No |
+| Omarchy                         | https://omarchy.org | No | Yes |
+| OpenBSD                         | https://openbsd.org | Yes | No |
+| openEuler                       | https://openeuler.org | Yes | No |
+| openSUSE                        | https://opensuse.org | Yes | No |
+| Oracle Linux                    | https://www.oracle.com/linux/ | Yes | Installer |
+| Parrot Security                 | https://www.parrotsec.org | No | Yes |
+| Peppermint                      | https://peppermintos.com | No | Yes |
+| Pop OS                          |https://system76.com/pop| No | Yes |
+| Proxmox Open Source Products    | https://www.proxmox.com/ | Yes | No |
+| Q4OS                            | https://q4os.org | No | Yes |
+| Raizo                           | https://sourceforge.net/projects/live-raizo/ | No | Yes |
+| Red Hat Enterprise Linux        | https://www.redhat.com | User supplied media | No |
+| Red Hat Enterprise Linux CoreOS | https://openshift.com | Yes | No |
+| Regolith                        | https://regolith-linux.org | No | Yes |
+| Rocky Linux                     | https://rockylinux.org/ | Yes | No |
+| Septor                          | https://septor.sourceforge.io | No | Yes |
+| Slackware                       | https://www.slackware.com | Yes | No |
+| SmartOS                         | https://www.smartos.org/ | Yes | No |
+| SparkyLinux                     | https://sparkylinux.org/ | No | Yes |
+| Tails                           | https://tails.net | No | Yes |
+| Talos                           | https://www.talos.dev/ | Yes | No |
+| Tiny Core Linux                 | https://tinycorelinux.net | Yes | Yes |
+| Ubuntu                          | https://www.ubuntu.com | Yes | Yes |
+| VMware                          | https://www.vmware.com | User supplied media | No |
+| VMware Photon                   | https://vmware.github.io/photon/ | Yes | No |
+| Vanilla OS                      | https://vanillaos.org | No | Yes |
+| Voyager                         | https://voyagerlive.org | No | Yes |
+| VyOS                            | https://vyos.io | Yes | No |
+| Zen Installer                   | https://sourceforge.net/projects/revenge-installer | Yes | No |
+| Zorin OS                        | https://zorin.com | No | Yes |
 
 ### Utilities
 
@@ -194,22 +211,23 @@ In addition to being able to host netboot.xyz locally, you can also create your 
 |------------|-------------------------|------|
 | 4MLinux | https://4mlinux.com/ | Kernel/Initrd |
 | Boot Repair CD | https://sourceforge.net/projects/boot-repair-cd/ | LiveCD |
-| Breakin | http://www.advancedclustering.com/products/software/breakin/ | Kernel/Initrd |
+| Breakin | https://www.advancedclustering.com/products/software/breakin/ | Kernel/Initrd |
 | CAINE | https://www.caine-live.net/ | LiveCD |
-| Clonezilla | http://www.clonezilla.org/ | LiveCD |
-| DBAN | http://www.dban.org/ | Kernel |
-| GParted | http://gparted.org | LiveCD |
-| Grml | http://grml.org | LiveCD |
-| Kaspersky Rescue Disk | https://support.kaspersky.com/viruses/krd18 | LiveCD |
-| Memtest | http://www.memtest.org/ | Kernel |
+| Clonezilla | https://www.clonezilla.org/ | LiveCD |
+| DBAN | https://www.dban.org/ | Kernel |
+| GParted | https://gparted.org | LiveCD |
+| Grml | https://grml.org | LiveCD |
+| Kaspersky Rescue Disk | https://support.kaspersky.com/krd18 | LiveCD |
+| Memtest | https://www.memtest.org/ | Kernel |
 | MemTest86 Free | https://www.memtest86.com | USB Img |
 | Redo Rescue | http://redorescue.com/ | LiveCD |
 | Rescatux | https://www.supergrubdisk.org/rescatux/ | LiveCD |
 | Rescuezilla | https://rescuezilla.com/ | LiveCD |
 | ShredOS | https://github.com/PartialVolume/shredos.x86_64 | Kernel | 
-| Super Grub2 Disk | http://www.supergrubdisk.org | ISO - Memdisk |
+| Super Grub2 Disk | https://www.supergrubdisk.org | ISO - Memdisk |
 | System Rescue | https://system-rescue.org/ | LiveCD |
-| Ultimate Boot CD | http://www.ultimatebootcd.com | ISO - Memdisk |
+| Ultimate Boot CD | https://www.ultimatebootcd.com | ISO - Memdisk |
+| ZFSBootMenu | https://docs.zfsbootmenu.org/ | Kernel |
 
 ### Stargazers over time
 

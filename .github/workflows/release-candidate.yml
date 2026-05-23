@@ -18,7 +18,7 @@ jobs:
       id-token: write
       contents: write
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         ref: RC
 
@@ -39,7 +39,7 @@ jobs:
         ./script/build_release rc
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_STAGING }}
         aws-region: ${{ secrets.AWS_ACCESS_REGION }}
@@ -66,7 +66,7 @@ jobs:
 
     - name: Extract release notes
       id: extract-release-notes
-      uses: ffurrer2/extract-release-notes@v1
+      uses: ffurrer2/extract-release-notes@v3
 
     - name: Create RC Release and Upload Assets
       uses: svenstaro/upload-release-action@v2
